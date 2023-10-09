@@ -1,7 +1,7 @@
 <script setup>
 import * as echarts from 'echarts';
 const chartDom = ref(null);
-const props = defineProps(['data', 'title','width'])
+const props = defineProps(['data', 'title', 'width', 'colorBoard'])
 
 
 let option, chart;
@@ -34,8 +34,8 @@ function refreshChart() {
       text: props.title,
       left: 'center',
       top: 'center',
-      textStyle:{
-        fontSize:24
+      textStyle: {
+        fontSize: 24
       }
     },
     legend: {
@@ -47,7 +47,7 @@ function refreshChart() {
       {
         name: props.title,
         type: 'pie',
-        radius: ['40%','66%'],
+        radius: ['40%', '66%'],
         data: Object.keys(props.data).map(it => { return { value: (props.data[it] / 60 / 7.5).toFixed(2), name: it } }).sort((a, b) => { return b.value - a.value }),
         label: {
           show: true,
@@ -61,11 +61,11 @@ function refreshChart() {
           edgeDistance: 10,
           lineHeight: 15,
           rich: {
-            name:{
-              fontWeight:'bold',
+            name: {
+              fontWeight: 'bold',
             },
             time: {
-              fontWeight:'bold',
+              fontWeight: 'bold',
               color: '#888'
             },
             day: {
@@ -74,6 +74,10 @@ function refreshChart() {
           }
         },
         itemStyle: {
+          color: (params) => {
+            // console.log(params.data.name)
+            return props.colorBoard ? props.colorBoard[params.data.name] : null;
+          },
           borderColor: '#fff',
           borderWidth: 1
         }
@@ -102,7 +106,10 @@ watch(() => props.data, (newVal, oldVal) => {
 </template>
 
 <style lang="scss">
-.chartBox{padding-top: 75%;width: 100%;}
+.chartBox {
+  padding-top: 75%;
+  width: 100%;
+}
 ._chart {
   position: absolute;
   top: 0;
