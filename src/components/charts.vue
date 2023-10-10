@@ -1,7 +1,7 @@
 <script setup>
 import * as echarts from 'echarts';
 const chartDom = ref(null);
-const props = defineProps(['data', 'title', 'width', 'colorBoard'])
+const props = defineProps(['data', 'title', 'width', 'colorBoard', 'chartOption'])
 
 
 let option, chart;
@@ -16,7 +16,7 @@ let timeout = null
 function initChart() {
   if (!option || !chartDom.value) return;
   // console.clear()
-  console.log('⭐⭐',option,props.title,chartDom.value,props.colorBoard)
+  // console.log('⭐⭐', option, props.title, chartDom.value, props.colorBoard)
   if (!chart) chart = echarts.init(chartDom.value);
   chart.setOption(option);
 
@@ -25,8 +25,12 @@ function initChart() {
     chart?.resize({
       duration: 500
     })
-  }, 1000)
+  }, 200)
 }
+function getFontSize(max = 20) {
+  let fz = window.innerWidth / 980 * max
+  return Math.min(Math.max(fz, 12), max)
+};
 function refreshChart() {
   let color = props.data.color || '#00bfff'
   option = {
@@ -35,10 +39,15 @@ function refreshChart() {
       left: 'center',
       top: 'center',
       textStyle: {
-        fontSize: 24
-      }
+        fontSize: props.chartOption?.titleFontSize ?? 40
+      },
+      backgroundColor: '#fff',
+      borderColor: '#fff',
+      borderRadius: 4,
+      borderWidth: 2
     },
     legend: {
+      show: props.chartOption?.showLegend ?? 1,
       // orient: 'vertical',
       // left: 'left',
       top: 'bottom'
@@ -47,13 +56,14 @@ function refreshChart() {
       {
         name: props.title,
         type: 'pie',
-        radius: ['40%', '66%'],
-        data: Object.keys(props.data).map(it => { return { value: (props.data[it] / 60 / 7.5).toFixed(2), name: it } }).sort((a, b) => { return b.value - a.value }),
+        radius: props.data.chartOption?.radius || ['40%', '66%'],
+        data: Object.keys(props.data).map(it => { return { value: (props.data[it] / 60 / 7.5).toFixed(2), name: it } }).sort((a, b) => { return a.value - b.value }),
+        silent: 1,
         label: {
           show: true,
-          // alignTo: 'edge',
-          alignTo: 'labelLine',
-          formatter: '{name|{b}}\n{time|{d}%} {day|| {c} 人天}',
+          alignTo: 'edge',
+          // alignTo: 'labelLine',
+          formatter: '{name|{b}}\n{time|{d}%}{day| | {c} 人天}',
           /* formatter(param) {
             return `${param.name} ( ${(param.value / 60 / 7.5).toFixed(2)}人天 | ${param.percent}%)`;
           }, */
@@ -63,19 +73,21 @@ function refreshChart() {
           rich: {
             name: {
               fontWeight: 'bold',
+              // fontSize: getFontSize(30),
             },
             time: {
               fontWeight: 'bold',
+              // fontSize: getFontSize(30),
               color: '#888'
             },
             day: {
+              // fontSize: getFontSize(30),
               color: '#888'
             }
           }
         },
         itemStyle: {
           color: (params) => {
-            console.log(params)
             return props.colorBoard ? props.colorBoard[params.data.name] : [];
           },
           borderColor: '#fff',
@@ -84,7 +96,7 @@ function refreshChart() {
       }
     ]
   };
-  if(!props.colorBoard)delete option.series[0].itemStyle.color;
+  if (!props.colorBoard) delete option.series[0].itemStyle.color;
   initChart()
 }
 watch(() => props.data, (newVal, oldVal) => {
@@ -95,6 +107,7 @@ watch(() => props.data, (newVal, oldVal) => {
 
 onMounted(() => {
   initChart()
+  window.addEventListener('resize', refreshChart)
 })
 
 // const style = `width:${width}px;height:${width*.75}px`
@@ -102,15 +115,26 @@ onMounted(() => {
 
 <template>
   <div class="chartBox" ref="chartBoxRef">
-    <!-- <p>{{props.colorBoard}}</p> -->
+    <!-- <p>{{props.chartOption?.titleFontSize}}</p> -->
     <div class="_chart  fx1" ref="chartDom"></div>
   </div>
 </template>
 
 <style lang="scss">
 .chartBox {
-  padding-top: 75%;
+  padding-top: 72%;
   width: 100%;
+  &:before {
+    content: attr(num);
+    position: absolute;
+    top: 0;
+    width: 50%;
+    text-align: center;
+    font-size: 16em;
+    line-height: 1;
+    font-weight: bold;
+    color: #e5e8e9;
+  }
 }
 ._chart {
   position: absolute;

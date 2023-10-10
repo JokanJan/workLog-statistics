@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 import Charts from './components/charts.vue'
 
 const
@@ -12,15 +12,19 @@ const data = reactive({
   projectTotal: {},
   typeTotal: {},
   total: {},
-  typesColorMap: {}
+  typesColorMap: {},
+  projectMap: []
 })
 
 // const colorBoard = ['#DC573D', '#D14064', '#76348D', '#5F3FB2', '#4551B2', '#5395EF', '#57A7F2', '#60B9D4', '#4B9489', '#6CAC57', '#99BF55', '#D0DC4D', '#F2C333', '#ED9F2A', '#E6662F', '#715648', '#9F9F9F', '#687B8B']
 const colorBoard = ['#FF3D00', '#F51D7E', '#A200F2', '#651DFF', '#2979FF', '#009DFF', '#00BCD4', '#00BFA5', '#64DD17', '#FFAB00', '#FF6F00', '#915039', '#38454C']
+// const colorBoard = ['#F51D7E','#FF3D00', '#FF6F00', '#FFAB00','#64DD17', '#00BFA5', '#00BCD4',  '#009DFF', '#2979FF',  '#651DFF','#A200F2', '#915039', '#38454C']
 
 
 function generateCharts() {
+  if (!textarea.value.length) return;
   let _arr = textarea.value.split('\n')
+  // if (!Array.isArray(_arr)) return;
 
   data.thead = []
   data.projects = {}
@@ -64,27 +68,43 @@ function setTypesColorMap(_data) {
     let _type = it.name
     console.log(_type, data.typesColorMap, colorBoard.length)
     if (!data.typesColorMap[_type]) data.typesColorMap[_type] = colorBoard[Object.keys(data.typesColorMap).length % colorBoard.length];
+    data.projectMap = []
+    data.projectMap.push(...Object.keys(data.projectTotal).sort((a, b) => data.projectTotal[b] - data.projectTotal[a]))
     // if (i + 1 == arr.length) displayResult.value = 1;
   })
 }
+
+function print() {
+  window.print()
+}
+
+const isPrint = ref(0)
+onMounted(() => {
+  window.onbeforeprint = () => {
+    isPrint.value = 1
+  }
+  window.onafterprint = () => {
+    isPrint.value = 0
+  }
+})
 </script>
 
 <template>
-  <div class="body">
-    <div>
+  <div class="body ac">
+    <div class="inputForm df fdc aic" style="gap:1em">
       <textarea class="textarea" v-model="textarea"></textarea>
-      <button @click="generateCharts">生成</button>
+      <button class="btn" @click="generateCharts">生成</button>
     </div>
-    <p>{{ Object.keys(data.projectTotal) }}</p>
+    <!-- <p>{{ data.projectMap }}</p> -->
     <div class="result" v-if="displayResult">
       <Charts :data="data.projectTotal" title="项目时间分配" />
       <Charts :data="data.typeTotal" title="工作内容分配" :colorBoard="data.typesColorMap" />
       <!-- <Charts :data="data.projects['兴水治水']" title="兴水治水" /> -->
 
-      <div class="dg col2">
-        <template v-for="item in Object.keys(data.projectTotal)" :key="item">
+      <div class="dg col2" style="margin-top: 1em;">
+        <template v-for="(item,index) in data.projectMap" :key="item">
           <!-- <p>{{data.projects[item]}}</p> -->
-          <Charts :data="data.projects[item]" :title="item" :colorBoard="data.typesColorMap" />
+          <Charts :data="data.projects[item]" :title="item" :colorBoard="data.typesColorMap" :chartOption="{radius:'66%',showLegend:0,titleFontSize:20}" :num="index+1" />
         </template>
       </div>
     </div>
@@ -92,16 +112,47 @@ function setTypesColorMap(_data) {
 </template>
 
 <style lang="scss">
+.btn {
+  padding: .5em;
+  height: 3em;
+  width: 8em;
+  cursor: pointer;
+}
 .body {
   padding: 1em;
+  max-width: 960px;
 }
 
 .textarea {
   width: 100%;
-  padding: inherit;
+  padding: 1em;
+  box-sizing: border-box;
 }
 
 .dg.col2 {
   grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  >* {
+    border-bottom: 1px solid #e5e8ea;
+    &:last-child, &:nth-last-child(2):nth-child(odd) {
+      border: 0;
+    }
+  }
+}
+.result {
+  max-width: 2400px;
+}
+@media print {
+  .inputForm {
+    display: none;
+  }
+  // .chartBox:before {opacity: 0.25; }
+  // .body{zoom:2}
+}
+@page :first{
+  margin: 0 1cm 1cm 1cm;
+}
+@page {
+  margin: 1cm;
 }
 </style>
