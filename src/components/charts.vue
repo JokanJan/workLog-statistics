@@ -14,9 +14,9 @@ let timeout = null
 
 // 初始化并负值
 function initChart() {
-  if (!option) return;
+  if (!option || !chartDom.value) return;
   // console.clear()
-  console.log(option)
+  console.log('⭐⭐',option,props.title,chartDom.value,props.colorBoard)
   if (!chart) chart = echarts.init(chartDom.value);
   chart.setOption(option);
 
@@ -75,8 +75,8 @@ function refreshChart() {
         },
         itemStyle: {
           color: (params) => {
-            // console.log(params.data.name)
-            return props.colorBoard ? props.colorBoard[params.data.name] : null;
+            console.log(params)
+            return props.colorBoard ? props.colorBoard[params.data.name] : [];
           },
           borderColor: '#fff',
           borderWidth: 1
@@ -84,6 +84,7 @@ function refreshChart() {
       }
     ]
   };
+  if(!props.colorBoard)delete option.series[0].itemStyle.color;
   initChart()
 }
 watch(() => props.data, (newVal, oldVal) => {
@@ -92,16 +93,17 @@ watch(() => props.data, (newVal, oldVal) => {
   refreshChart()
 }, { immediate: 1 })
 
-/* onMounted(() => {
+onMounted(() => {
   initChart()
-}) */
+})
 
 // const style = `width:${width}px;height:${width*.75}px`
 </script>
 
 <template>
   <div class="chartBox" ref="chartBoxRef">
-    <div class="_chart  fx1" :class="{'noData': !option}" ref="chartDom"></div>
+    <!-- <p>{{props.colorBoard}}</p> -->
+    <div class="_chart  fx1" ref="chartDom"></div>
   </div>
 </template>
 
