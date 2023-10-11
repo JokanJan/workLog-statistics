@@ -57,7 +57,8 @@ function refreshChart() {
         name: props.title,
         type: 'pie',
         radius: props.data.chartOption?.radius || ['40%', '66%'],
-        data: Object.keys(props.data).map(it => { return { value: (props.data[it] / 60 / 7.5).toFixed(2), name: it } }).sort((a, b) => { return a.value - b.value }),
+        data: Object.keys(props.data).map(it => { return { value: (props.data[it] / 60 / 7.5).toFixed(2), name: it } }).sort((a, b) => { return b.value - a.value }),
+        clockwise: 0,
         silent: 1,
         label: {
           show: true,
@@ -124,6 +125,7 @@ onMounted(() => {
 .chartBox {
   padding-top: 72%;
   width: 100%;
+
   &:before {
     content: attr(num);
     position: absolute;
@@ -136,12 +138,14 @@ onMounted(() => {
     color: #e5e8e9;
   }
 }
+
 ._chart {
   position: absolute;
   top: 0;
   width: 100%;
   height: 100%;
   justify-content: center;
+
   &.noData {
     &:before {
       content: '暂无数据';
