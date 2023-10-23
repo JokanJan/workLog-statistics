@@ -23,7 +23,7 @@ export default defineConfig({
   base: './',
   publicDir: 'static',
   build: {
-    outDir:"./public",
+    outDir:"./docs",
     emptyOutDir: 1,
     assetsDir: './static',
     chunkSizeWarningLimit: 500,

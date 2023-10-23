@@ -1,7 +1,7 @@
 <script setup>
 import * as echarts from 'echarts';
 const chartDom = ref(null);
-const props = defineProps(['data', 'title', 'width', 'colorBoard', 'chartOption'])
+const props = defineProps(['data', 'title', 'width', 'colorBoard', 'chartOption', 'titleColor','colors'])
 
 
 let option, chart;
@@ -39,6 +39,7 @@ function refreshChart() {
       left: 'center',
       top: 'center',
       textStyle: {
+        // color: props.titleColor || '#333',
         fontSize: props.chartOption?.titleFontSize ?? 40
       },
       backgroundColor: '#fff',
@@ -52,6 +53,7 @@ function refreshChart() {
       // left: 'left',
       top: 'bottom'
     },
+    color:props.colors,
     series: [
       {
         name: props.title,
@@ -98,6 +100,7 @@ function refreshChart() {
     ]
   };
   if (!props.colorBoard) delete option.series[0].itemStyle.color;
+  if (!props.colors) delete option.color;
   initChart()
 }
 watch(() => props.data, (newVal, oldVal) => {
@@ -116,6 +119,7 @@ onMounted(() => {
 
 <template>
   <div class="chartBox" ref="chartBoxRef">
+    <div class="overCircle" v-show="titleColor" :style="`background:${titleColor}`"></div>
     <!-- <p>{{props.chartOption?.titleFontSize}}</p> -->
     <div class="_chart  fx1" ref="chartDom"></div>
   </div>
@@ -157,4 +161,5 @@ onMounted(() => {
     }
   }
 }
+.overCircle{position: absolute;left: 50%;top: 53%;width: 1em;height: 1em;transform: translate(-50%, 0) rotate(45deg);mix-blend-mode: darken;}
 </style>

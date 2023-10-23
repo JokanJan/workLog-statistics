@@ -17,8 +17,12 @@ const data = reactive({
 })
 
 // const colorBoard = ['#DC573D', '#D14064', '#76348D', '#5F3FB2', '#4551B2', '#5395EF', '#57A7F2', '#60B9D4', '#4B9489', '#6CAC57', '#99BF55', '#D0DC4D', '#F2C333', '#ED9F2A', '#E6662F', '#715648', '#9F9F9F', '#687B8B']
-const colorBoard = ['#FF3D00', '#F51D7E', '#A200F2', '#651DFF', '#2979FF', '#009DFF', '#00BCD4', '#00BFA5', '#64DD17', '#FFAB00', '#FF6F00', '#915039', '#38454C']
+const colorBoard = ['#FF3D00', '#F51D7E', '#A200F2', '#651DFF', '#2979FF', '#009DFF', '#00BCD4', '#00BFA5', '#64DD17', '#FFAB00', '#FF6F00', '#915039'/* , '#38454C' */]
 // const colorBoard = ['#F51D7E','#FF3D00', '#FF6F00', '#FFAB00','#64DD17', '#00BFA5', '#00BCD4',  '#009DFF', '#2979FF',  '#651DFF','#A200F2', '#915039', '#38454C']
+
+const colorBoardR = computed(()=>{
+  return ['#578ba7',...colorBoard].reverse()
+})
 
 
 function generateCharts() {
@@ -97,14 +101,14 @@ onMounted(() => {
     </div>
     <!-- <p>{{ data.projectMap }}</p> -->
     <div class="result" v-if="displayResult">
-      <Charts :data="data.projectTotal" title="项目时间分配" />
+      <Charts :data="data.projectTotal" title="项目时间分配" :colors="colorBoardR"/>
       <Charts :data="data.typeTotal" title="工作内容分配" :colorBoard="data.typesColorMap" />
       <!-- <Charts :data="data.projects['兴水治水']" title="兴水治水" /> -->
 
       <div class="dg col2" style="margin-top: 1em;">
         <template v-for="(item,index) in data.projectMap" :key="item">
           <!-- <p>{{data.projects[item]}}</p> -->
-          <Charts :data="data.projects[item]" :title="item" :colorBoard="data.typesColorMap" :chartOption="{radius:'66%',showLegend:0,titleFontSize:20}" :num="index+1" />
+          <Charts :data="data.projects[item]" :title="item" :colorBoard="data.typesColorMap" :chartOption="{radius:'66%',showLegend:0,titleFontSize:20}" :num="index+1" :titleColor="colorBoardR[index]" />
         </template>
       </div>
     </div>
