@@ -1,7 +1,7 @@
 <script setup>
 import * as echarts from 'echarts';
 const chartDom = ref(null);
-const props = defineProps(['data', 'title', 'width', 'colorBoard', 'chartOption', 'titleColor','colors'])
+const props = defineProps(['data', 'title', 'width', 'colorBoard', 'chartOption', 'themeColor', 'colors'])
 
 
 let option, chart;
@@ -38,8 +38,9 @@ function refreshChart() {
       text: props.title,
       left: 'center',
       top: 'center',
+      padding: [8, 5, 4, 5],
       textStyle: {
-        // color: props.titleColor || '#333',
+        // color: props.themeColor || '#333',
         fontSize: props.chartOption?.titleFontSize ?? 40
       },
       backgroundColor: '#fff',
@@ -53,7 +54,7 @@ function refreshChart() {
       // left: 'left',
       top: 'bottom'
     },
-    color:props.colors,
+    color: props.colors,
     series: [
       {
         name: props.title,
@@ -62,6 +63,12 @@ function refreshChart() {
         data: Object.keys(props.data).map(it => { return { value: (props.data[it] / 60 / 7.5).toFixed(2), name: it } }).sort((a, b) => { return b.value - a.value }),
         clockwise: 0,
         silent: 1,
+        /* labelLayout: function () {
+          return {
+            // x: chart.getWidth() - 100,
+            moveOverlap: 'shiftY'
+          };
+        }, */
         label: {
           show: true,
           alignTo: 'edge',
@@ -73,6 +80,11 @@ function refreshChart() {
           minMargin: 5,
           edgeDistance: 10,
           lineHeight: 15,
+          textBorderWidth: 2,
+          textBorderColor: '#fff',
+          textShadowColor: '#000',
+          textShadowOffsetX: 2,
+          textShadowOffsetY: 5,
           rich: {
             name: {
               fontWeight: 'bold',
@@ -88,6 +100,10 @@ function refreshChart() {
               color: '#888'
             }
           }
+        },
+        labelLine: {
+          minTurnAngle: 116,
+          // maxSurfaceAngle:160
         },
         itemStyle: {
           color: (params) => {
@@ -119,7 +135,7 @@ onMounted(() => {
 
 <template>
   <div class="chartBox" ref="chartBoxRef">
-    <div class="overCircle" v-show="titleColor" :style="`background:${titleColor}`"></div>
+    <div class="overCircle" v-show="themeColor" :style="`background:${themeColor}`"></div>
     <!-- <p>{{props.chartOption?.titleFontSize}}</p> -->
     <div class="_chart  fx1" ref="chartDom"></div>
   </div>
@@ -161,5 +177,13 @@ onMounted(() => {
     }
   }
 }
-.overCircle{position: absolute;left: 50%;top: 53%;width: 1em;height: 1em;transform: translate(-50%, 0) rotate(45deg);mix-blend-mode: darken;}
+.overCircle {
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  width: 1em;
+  height: 1em;
+  transform: translate(-50%, 0) rotate(45deg);
+  mix-blend-mode: darken;
+}
 </style>
