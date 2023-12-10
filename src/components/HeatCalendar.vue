@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted, reactive, ref, watch } from 'vue';
 import * as echarts from 'echarts';
 const chartDom = ref(null);
 const props = defineProps(['data', 'chartOption', 'themeColor', 'colors'])
@@ -65,7 +66,7 @@ function refreshChart() {
       },
       dayLabel: {
         firstDay: 6,
-        showWeekend:false,
+        showWeekend: false,
         show: false,
       },
       monthLabel: {
@@ -78,8 +79,8 @@ function refreshChart() {
       type: 'heatmap',
       coordinateSystem: 'calendar',
       data: props.data,
-      itemStyle:{
-        color:"#f37"
+      itemStyle: {
+        color: "#f37"
       },
       label: {
         show: true,

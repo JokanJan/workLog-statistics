@@ -1,18 +1,25 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
-import AutoImport from 'unplugin-auto-import/vite';
-import externalGlobals from 'rollup-plugin-external-globals';
-const globals = externalGlobals({
-  echart: 'echart'
-});
+import { createHtmlPlugin } from 'vite-plugin-html';
+import { autoComplete, Plugin as importToCDN } from 'vite-plugin-cdn-import';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    AutoImport({
-      imports: ['vue']
+    importToCDN({
+      modules: [
+        autoComplete('vue'),
+        {
+          name: 'echarts',
+          var: 'echarts',
+          path: 'https://unpkg.com/echarts@5.4.3/dist/echarts.min.js'
+        }
+      ]
+    }),
+    createHtmlPlugin({
+      minify: true
     })
   ],
   resolve: {
@@ -20,16 +27,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
-
   base: './',
   publicDir: 'static',
   build: {
-    rollupOptions: {
-      external: ['echart'],
-      plugins: [globals]
-    },
     outDir: './docs',
     emptyOutDir: 1,
+    assetsInlineLimit: 0,
     assetsDir: './static',
     chunkSizeWarningLimit: 500,
     minify: 'terser',
